@@ -23,7 +23,7 @@ export class ProductService {
 
     update(updateProductRequest: UpdateProductRequest){
         const id = updateProductRequest.id;
-        const data = new UpdateProductData(updateProductRequest.name, updateProductRequest.description, updateProductRequest.price);
+        const data = new UpdateProductData(updateProductRequest.name, updateProductRequest.description, updateProductRequest.price, updateProductRequest.quantity);
 
         return this.db.product.update({
             where: {
@@ -33,8 +33,18 @@ export class ProductService {
         })
     }
     
-    delete(id: number){
+    async delete(id: number, force = false){
         id = Number(id)
+        if (force){
+            await this.db.orderItem.deleteMany({where: {productId: id}})
+            return this.db.product.delete({where: {id}})
+        }
         return this.db.product.delete({where: {id}})
+    }
+
+    static async isQuantityAvailable(productId: number, quantity: number){
+        const db = PrismaService.getInstance().getClient();
+        const product = await db.product.findFirst({where: {id: productId}})
+        return product.quantity >= quantity
     }
 }

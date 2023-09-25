@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Put, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Put, Delete, Query } from '@nestjs/common';
 import { CreateProductRequest } from 'src/dto/product/CreateProductRequest';
 import { UpdateProductRequest } from 'src/dto/product/UpdateProductRequest';
 import { ProductService } from 'src/services/product/product.service';
@@ -28,7 +28,7 @@ export class ProductController {
     }
 
     @Delete('/:id')
-    deleteProduct(@Param('id') id: number){
-        return this.productService.delete(id);
+    deleteProduct(@Param('id') id: number, @Query('force' ) force: boolean){
+        return this.productService.delete(id, force);
     }
 }

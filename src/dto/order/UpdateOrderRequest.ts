@@ -2,8 +2,11 @@ import { IsIn, IsNotEmpty, ValidateNested } from "class-validator"
 import { CreateOrderItemRequest } from "./CreateOrderItemRequest"
 import { Type } from "class-transformer"
 
-export class CreateOrderRequest{
+export class UpdateOrderRequest{
     
+    @IsNotEmpty()
+    orderId: number
+
     @IsNotEmpty()
     userId: string
 

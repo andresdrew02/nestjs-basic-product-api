@@ -1,5 +1,5 @@
 export const tableNames = {
     PRODUCTS: 'Product',
-    ORDERS: 'Order',
+    ORDER: 'Order',
     ORDERITEM: 'OrderItem'
 }

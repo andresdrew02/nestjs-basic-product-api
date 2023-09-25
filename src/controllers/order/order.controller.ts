@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Delete, Param } from '@nestjs/common';
+import { CreateOrderRequest } from 'src/dto/order/CreateOrderRequest';
+import { UpdateOrderRequest } from 'src/dto/order/UpdateOrderRequest';
 import { OrderService } from 'src/services/order/order.service';
 
-@Controller('order')
+@Controller('orders')
 export class OrderController {
     constructor(private readonly orderService: OrderService){}
 
@@ -11,8 +13,18 @@ export class OrderController {
     }
 
     @Post()
-    //TODO POR AKI
-    save(){
+    save(@Body() createOrderRequest: CreateOrderRequest){
+        return this.orderService.save(createOrderRequest);
+    }
+
+    @Put()
+    update(@Body() updateOrderRequest: UpdateOrderRequest){
+        return this.orderService.update(updateOrderRequest);
+    }
+
+    @Delete("/:id")
+    delete(@Param('id') id: string){
+        return this.orderService.delete(id);
 
     }
 }
