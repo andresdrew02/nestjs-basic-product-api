@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/db/PrismaService';
+import { ProductFilter } from 'src/dto/filters/ProductFilter';
 import { CreateProductRequest } from 'src/dto/product/CreateProductRequest';
 import { UpdateProductData } from 'src/dto/product/UpdateProductData';
 import { UpdateProductRequest } from 'src/dto/product/UpdateProductRequest';
@@ -7,8 +8,8 @@ import { UpdateProductRequest } from 'src/dto/product/UpdateProductRequest';
 @Injectable()
 export class ProductService {
     private db = PrismaService.getInstance().getClient();
-    findAll(){
-        return this.db.product.findMany()
+    findAll(filters: ProductFilter){
+        return this.db.product.findMany({ where: { name: { contains: filters.name }}})
     }
 
     save(createProductRequest: CreateProductRequest){

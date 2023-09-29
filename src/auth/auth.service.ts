@@ -48,7 +48,10 @@ export class AuthService {
 
     async login(loginRequest: LoginRequest){
         const { email, password } = loginRequest;
-        const user = await this.db.user.findFirstOrThrow({ where: {email} });
+        const user = await this.db.user.findFirst({ where: {email} });
+        if (!user){
+            return new HttpException('Incorrect user or password', 400)
+        }
         if (!await bcrypt.compare(password, user.password)){
             throw new HttpException('Incorrect user or password', 400)
         }

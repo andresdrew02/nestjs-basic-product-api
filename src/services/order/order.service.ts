@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Request } from '@nestjs/common';
 import { PrismaService } from 'src/db/PrismaService';
 import { CreateOrderItemRequest } from 'src/dto/order/CreateOrderItemRequest';
 import { CreateOrderRequest } from 'src/dto/order/CreateOrderRequest';
 import { UpdateOrderRequest } from 'src/dto/order/UpdateOrderRequest';
 import { ProductService } from '../product/product.service';
 import { Prisma } from '@prisma/client';
-import { Order } from 'src/models/Order';
 
 export type RegularizedOrderItems = {
     productId: number
@@ -71,7 +70,7 @@ export class OrderService {
         return this.db.order.findFirst({ where: { id: Number.parseInt(id) }, include: { orderItems: true}})
     }
 
-    async save(createOrderRequest: CreateOrderRequest){
+    async save(createOrderRequest: CreateOrderRequest, req: any){
         const order = await this.db.$transaction(async () => {
             // Regularize Order Items quantity
             const regularizedItems = this.regularizeOrderItems(createOrderRequest.orderItems)
@@ -81,7 +80,7 @@ export class OrderService {
 
             // Create Order
             const order = await this.db.order.create({data: {
-                userId: createOrderRequest.userId,
+                userId: req.user.id,
                 status: createOrderRequest.status
             }})
 
