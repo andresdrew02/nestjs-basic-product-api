@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/PrismaService';
 import { ProductFilter } from 'src/dto/filters/ProductFilter';
 import { CreateProductRequest } from 'src/dto/product/CreateProductRequest';
@@ -11,7 +12,7 @@ export class ProductService {
 
     //TODO: Implement Filters
     findAll(filters: ProductFilter){
-        return this.db.product.findMany({ where: { name: { contains: filters.name }}})
+        return this.db.$queryRaw`${Prisma.raw(ProductFilter.generateSQL(filters))}`
     }
 
     save(createProductRequest: CreateProductRequest){
