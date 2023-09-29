@@ -1,3 +1,3 @@
 export class ProductFilter{
-    constructor(public name?: string, public description?: string, public price?: string, public quantity?: string){}
+    constructor(public name?: string, public price?: string, public quantity?: string, public page?: number, public limit?: number){}
 }

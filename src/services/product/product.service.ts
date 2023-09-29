@@ -8,6 +8,8 @@ import { UpdateProductRequest } from 'src/dto/product/UpdateProductRequest';
 @Injectable()
 export class ProductService {
     private db = PrismaService.getInstance().getClient();
+
+    //TODO: Implement Filters
     findAll(filters: ProductFilter){
         return this.db.product.findMany({ where: { name: { contains: filters.name }}})
     }
