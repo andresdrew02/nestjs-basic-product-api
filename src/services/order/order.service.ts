@@ -5,17 +5,30 @@ import { CreateOrderRequest } from 'src/dto/order/CreateOrderRequest';
 import { UpdateOrderRequest } from 'src/dto/order/UpdateOrderRequest';
 import { ProductService } from '../product/product.service';
 import { Prisma } from '@prisma/client';
+import { Order } from 'src/models/Order';
 
-type RegularizedOrderItems = {
+export type RegularizedOrderItems = {
     productId: number
     quantity: number
+}
+
+export interface RegularizedOrderItemsWithPrice extends RegularizedOrderItems {
+    linePrice: number
+}
+
+type OrderWithPrice = {
+    id: number
+    userId: string
+    orderDate: Date
+    status: string
+    totalPrice: number
 }
 
 @Injectable()
 export class OrderService {
     private db = PrismaService.getInstance().getClient();
     
-    regularizeOrderItems(createOrderItemRequest: CreateOrderItemRequest[]): RegularizedOrderItems[] {
+    private regularizeOrderItems(createOrderItemRequest: CreateOrderItemRequest[]): RegularizedOrderItems[] {
         const regularizedOrderItems: RegularizedOrderItems[] = []
         createOrderItemRequest.forEach(orderItem => {
             if (regularizedOrderItems.some(regularizedItem => regularizedItem.productId === orderItem.productId)){
@@ -30,6 +43,22 @@ export class OrderService {
         return regularizedOrderItems;
     }
 
+    private async calculateOrderItemsWithPrice(regularizedOrderItems: RegularizedOrderItems[]){
+        const regularizedItemsWithPrice: RegularizedOrderItemsWithPrice[] = []
+        regularizedOrderItems.forEach(async orderItem => {
+            regularizedItemsWithPrice.push({
+                productId: orderItem.productId,
+                quantity: orderItem.quantity,
+                linePrice: orderItem.quantity * (await ProductService.getProductById(orderItem.productId)).price
+            })
+        })
+        return regularizedItemsWithPrice
+    }
+
+    private calculateTotal(regularizedItemsWithPrice: RegularizedOrderItemsWithPrice[]){
+        return regularizedItemsWithPrice.reduce((total, item) => total + item.linePrice, 0)
+    }
+
     findAll(){
         return this.db.order.findMany({
             include: {
@@ -38,16 +67,24 @@ export class OrderService {
         })
     }
 
+    findOne(id: string){
+        return this.db.order.findFirst({ where: { id: Number.parseInt(id) }, include: { orderItems: true}})
+    }
+
     async save(createOrderRequest: CreateOrderRequest){
-        const orderId = await this.db.$transaction(async () => {
+        const order = await this.db.$transaction(async () => {
+            // Regularize Order Items quantity
+            const regularizedItems = this.regularizeOrderItems(createOrderRequest.orderItems)
+
+            // Calculate Line Price
+            const regularizedItemsWithPrice: RegularizedOrderItemsWithPrice[] = await this.calculateOrderItemsWithPrice(regularizedItems)
+
             // Create Order
             const order = await this.db.order.create({data: {
                 userId: createOrderRequest.userId,
-                status: createOrderRequest.status,
+                status: createOrderRequest.status
             }})
 
-            // Regularize Order Items quantity
-            const regularizedItems = this.regularizeOrderItems(createOrderRequest.orderItems)
 
             // Check Product Quantity Before Insert
             for (let i = 0; i < regularizedItems.length; i++){
@@ -61,17 +98,18 @@ export class OrderService {
             }
             
             // Create Order Items
-            regularizedItems.forEach(async orderItem => {
+            regularizedItemsWithPrice.forEach(async orderItem => {
                 await this.db.orderItem.create({data: {
                     productId: orderItem.productId,
                     orderId: order.id,
-                    quantity: orderItem.quantity
+                    quantity: orderItem.quantity,
+                    totalLine: orderItem.linePrice
                 }})
             })
 
-            return {order, orderItems: regularizedItems}
+            return {order, orderItems: regularizedItemsWithPrice}
         })
-        return orderId
+        return order
     }
 
     async update(updateOrderRequest: UpdateOrderRequest){

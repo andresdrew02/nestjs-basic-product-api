@@ -4,9 +4,10 @@ import { ProductController } from './controllers/product/product.controller';
 import { OrderController } from './controllers/order/order.controller';
 import { ProductService } from './services/product/product.service';
 import { OrderService } from './services/order/order.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [],
+  imports: [AuthModule],
   controllers: [AppController, ProductController, OrderController],
   providers: [ProductService, OrderService],
 })

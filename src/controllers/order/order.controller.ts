@@ -12,6 +12,11 @@ export class OrderController {
         return this.orderService.findAll();
     }
 
+    @Get("/:id")
+    findOne(@Param('id') id: string){
+        return this.orderService.findOne(id);
+    }
+
     @Post()
     save(@Body() createOrderRequest: CreateOrderRequest){
         return this.orderService.save(createOrderRequest);
@@ -25,6 +30,5 @@ export class OrderController {
     @Delete("/:id")
     delete(@Param('id') id: string){
         return this.orderService.delete(id);
-
     }
 }

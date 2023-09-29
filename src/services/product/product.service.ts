@@ -47,4 +47,9 @@ export class ProductService {
         const product = await db.product.findFirst({where: {id: productId}})
         return product.quantity >= quantity
     }
+
+    static async getProductById(productId: number){
+        const db = PrismaService.getInstance().getClient();
+        return await db.product.findFirstOrThrow({ where: { id: productId}})
+    }
 }
