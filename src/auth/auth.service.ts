@@ -3,9 +3,13 @@ import { PrismaService } from 'src/db/PrismaService';
 import { RegisterRequest } from 'src/dto/auth/registerRequest';
 import * as bcrypt from 'bcrypt'
 import { LoginRequest } from 'src/dto/auth/loginRequest';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
+    constructor(private jwtService: JwtService){}
+
     private db = PrismaService.getInstance().getClient();
 
     private checkIfUserExists(email: string, username: string){
@@ -42,14 +46,15 @@ export class AuthService {
         return new Error('User not created')
     }
 
-    //TODO: JWT SERVICE
-
     async login(loginRequest: LoginRequest){
         const { email, password } = loginRequest;
         const user = await this.db.user.findFirstOrThrow({ where: {email} });
-        if (await bcrypt.compare(password, user.password)){
-            return user
+        if (!await bcrypt.compare(password, user.password)){
+            throw new HttpException('Incorrect user or password', 400)
         }
-        return new HttpException('Invalid credentials', 400)
+        const payload = { id: user.userId, username: user.username, email: user.email };
+        return {
+            access_token: await this.jwtService.signAsync(payload, { secret: jwtConstants.secret })
+        } 
     }
 }
