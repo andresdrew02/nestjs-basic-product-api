@@ -5,7 +5,7 @@ const stockTypes = {
 }
 
 export class ProductFilter{
-    constructor(public name?: string, public price?: string, public stock?: string, public page?: number, public limit?: number){}
+    constructor(public name?: string, public price?: string, public stock?: string, public page? : number){}
 
     public static generateSQL(filter: ProductFilter): string{
         let query = `SELECT * FROM product WHERE `
@@ -34,8 +34,9 @@ export class ProductFilter{
             
             query += stockTypes[filter.stock]
         }
+        query += ` LIMIT 10 OFFSET ${(filter.page - 1) * 10}`
         if (counter === 0 || (counter === 1 && stockTypes[filter.stock] === "")){
-            query = `SELECT * FROM product`
+            query = `SELECT * FROM product LIMIT 10 OFFSET ${(filter.page - 1) * 10}`
         }
         return query
     }

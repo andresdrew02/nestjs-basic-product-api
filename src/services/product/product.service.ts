@@ -10,8 +10,10 @@ import { UpdateProductRequest } from 'src/dto/product/UpdateProductRequest';
 export class ProductService {
     private db = PrismaService.getInstance().getClient();
 
-    //TODO: Implement Filters
     findAll(filters: ProductFilter){
+        if (!filters.page){
+            filters.page = 1
+        }
         return this.db.$queryRaw`${Prisma.raw(ProductFilter.generateSQL(filters))}`
     }
 
