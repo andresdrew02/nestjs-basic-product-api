@@ -7,28 +7,28 @@ import { OrderService } from 'src/services/order/order.service';
 export class OrderController {
     constructor(private readonly orderService: OrderService){}
 
-    @Get()
-    findAll() {
-        return this.orderService.findAll();
-    }
+    // @Get()
+    // findAll() {
+    //     return this.orderService.findAll();
+    // }
 
-    @Get("/:id")
-    findOne(@Param('id') id: string){
-        return this.orderService.findOne(id);
-    }
+    // @Get("/:id")
+    // findOne(@Param('id') id: string){
+    //     return this.orderService.findOne(id);
+    // }
 
     @Post()
     save(@Body() createOrderRequest: CreateOrderRequest, @Request() req){
         return this.orderService.save(createOrderRequest, req);
     }
 
-    @Put()
-    update(@Body() updateOrderRequest: UpdateOrderRequest){
-        return this.orderService.update(updateOrderRequest);
-    }
+    // @Put()
+    // update(@Body() updateOrderRequest: UpdateOrderRequest){
+    //     return this.orderService.update(updateOrderRequest);
+    // }
 
-    @Delete("/:id")
-    delete(@Param('id') id: string){
-        return this.orderService.delete(id);
-    }
+    // @Delete("/:id")
+    // delete(@Param('id') id: string){
+    //     return this.orderService.delete(id);
+    // }
 }

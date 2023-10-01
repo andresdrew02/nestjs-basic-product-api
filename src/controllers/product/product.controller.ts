@@ -21,18 +21,20 @@ export class ProductController {
         return this.productService.findOne(id);
     }
 
-    @Post()
-    createProduct(@Body() createProductRequest: CreateProductRequest) {
-        return this.productService.save(createProductRequest);
-    }
+    // Uncomment it if you want to test it
 
-    @Put()
-    updateProduct(@Body() updateProductRequest: UpdateProductRequest){
-        return this.productService.update(updateProductRequest);
-    }
+    // @Post()
+    // createProduct(@Body() createProductRequest: CreateProductRequest) {
+    //     return this.productService.save(createProductRequest);
+    // }
 
-    @Delete('/:id')
-    deleteProduct(@Param('id') id: number, @Query('force' ) force: boolean){
-        return this.productService.delete(id, force);
-    }
+    // @Put()
+    // updateProduct(@Body() updateProductRequest: UpdateProductRequest){
+    //     return this.productService.update(updateProductRequest);
+    // }
+
+    // @Delete('/:id')
+    // deleteProduct(@Param('id') id: number, @Query('force' ) force: boolean){
+    //     return this.productService.delete(id, force);
+    // }
 }

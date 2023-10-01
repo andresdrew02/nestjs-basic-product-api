@@ -4,8 +4,8 @@ import { Type } from "class-transformer"
 
 export class CreateOrderRequest{
 
-    @IsIn(["pending", "paid", "cancelled", "delivered"])
-    status?: string
+    // @IsIn(["pending", "paid", "cancelled", "delivered"])
+    // status?: string
 
     @ValidateNested({ each: true })
     @Type(() => CreateOrderItemRequest)
