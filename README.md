@@ -1,73 +1,84 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# API Rest con NestJS
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Esta es una API Rest desarrollada con NestJS que proporciona funcionalidades para la gestión de productos y pedidos, así como autenticación de usuarios.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Funcionalidades
 
-## Description
+- **Productos**: Puedes realizar operaciones CRUD (Crear, Leer, Actualizar y Borrar) para gestionar productos. Ten en cuenta que la creación, actualización y eliminación de productos están deshabilitadas por defecto por razones de seguridad. Si deseas habilitar estas operaciones, puedes hacerlo siguiendo las instrucciones en el código fuente.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Pedidos**: También puedes realizar operaciones CRUD para gestionar pedidos. La eliminación y actualización de pedidos están deshabilitadas por defecto, pero puedes habilitarlas si lo deseas.
 
-## Installation
+- **Autenticación**: La API admite autenticación de usuarios con funciones de registro y inicio de sesión. Utiliza JSON Web Tokens (JWT) para mantener a los usuarios autenticados.
+
+- **Seguridad**: Se han implementado medidas de seguridad para limitar las acciones permitidas, como el acceso a los pedidos, que solo pueden ser vistos por el usuario que los creó.
+
+## Requisitos
+
+Asegúrate de tener instalado Node.js y npm en tu sistema antes de continuar.
+
+## Instalación
+
+1. Clona este repositorio en tu máquina local:
 
 ```bash
-$ npm install
+git clone https://github.com/andresdrew02/nestjs-basic-product-api
 ```
 
-## Running the app
+2. Navega al directorio del proyecto:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cd nestjs-basic-product-api
 ```
 
-## Test
+3. Instala las dependencias:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Support
+## Configuración
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1. Abre el archivo `config.ts` en la raíz del proyecto y configura las opciones de base de datos y JWT según tus necesidades. (Por defecto está configurado con SQLite3)
 
-## Stay in touch
+2. Si deseas habilitar las operaciones de creación, actualización y eliminación de productos o pedidos, busca las secciones correspondientes en los controladores y descomenta las líneas necesarias en el código fuente.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Uso
 
-## License
+1. Inicia la aplicación:
 
-Nest is [MIT licensed](LICENSE).
+```bash
+npm start
+```
+
+2. La API estará disponible en `http://localhost:3000` de forma predeterminada. Puedes modificar el puerto en el archivo de configuración si es necesario.
+
+## Endpoints
+
+A continuación, se enumeran los principales puntos finales de la API:
+
+- `GET /api/products`: Obtener la lista de productos.
+- `GET /api/productos`: Obtener un producto por su ID. (Revistar los filtros en el código).
+- `POST /api/products`: Crear un nuevo producto (habilitar en la configuración si es necesario).
+- `PUT /api/products/:id`: Actualizar un producto existente (habilitar en la configuración si es necesario).
+- `DELETE /api/products/:id`: Eliminar un producto existente (habilitar en la configuración si es necesario).
+- `DELETE /api/products/2?force=true` : Eliminar un producto existente junto a todos sus pedidos (habilitar en la configuración si es necesario).
+- `GET /api/orders`: Obtener la lista de pedidos.
+- `GET /api/orders/:id`: Obtener un pedido por su ID.
+- `POST /api/orders`: Crear un nuevo pedido.
+- `PUT /api/orders/:id`: Actualizar un pedido existente (habilitar en la configuración si es necesario).
+- `DELETE /api/orders/`: Eliminar un pedido existente (habilitar en la configuración si es necesario).
+
+- `POST /api/auth/register`: Registrar un nuevo usuario y obtener un token JWT.
+- `POST /api/auth/login`: Iniciar sesión y obtener un token JWT.
+
+## Contribución
+
+Si deseas contribuir a este proyecto, ¡estamos encantados de recibir tus contribuciones! Por favor, sigue los estándares de codificación y envía tus solicitudes de extracción.
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para obtener más detalles.
+
+---
+
+¡Gracias por usar esta API Rest desarrollada con NestJS! Si tienes alguna pregunta o problema, no dudes en crear un problema o ponerte en contacto con el equipo de desarrollo.
