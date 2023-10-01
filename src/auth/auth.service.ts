@@ -12,8 +12,8 @@ export class AuthService {
 
     private db = PrismaService.getInstance().getClient();
 
-    private checkIfUserExists(email: string, username: string){
-        const user = this.db.user.findFirst({ where: {email, OR: [{username}]} });
+    private async checkIfUserExists(email: string, username: string){
+        const user = await this.db.user.findFirst({ where: {email, OR: [{username}]} });
         return user !== null
     }
 
@@ -28,7 +28,7 @@ export class AuthService {
     async create(registerRequest: RegisterRequest){
         const { username, email, password } = registerRequest;
 
-        if (this.checkIfUserExists(email, username)){
+        if (await this.checkIfUserExists(email, username)){
             throw new HttpException('User already exists', 400)
         }
 
@@ -41,7 +41,10 @@ export class AuthService {
             }
         })
         if (user){
-            return user
+            const payload = { id: user.userId, username: user.username, email: user.email };
+            return {
+                access_token: await this.jwtService.signAsync(payload, { secret: jwtConstants.secret })
+            }
         }
         return new Error('User not created')
     }
