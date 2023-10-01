@@ -86,25 +86,25 @@ export class OrderService {
 
 
             // Check Product Quantity Before Insert
-            for (let i = 0; i < regularizedItems.length; i++){
-                if (!await ProductService.isQuantityAvailable(regularizedItems[i].productId, regularizedItems[i].quantity)){
+            for (const orderItem of regularizedItems){
+                if (!await ProductService.isQuantityAvailable(orderItem.productId, orderItem.quantity)){
                     throw new Error('Product not available')
                 }
 
                 // Update Product Quantity
-                const sql = `UPDATE Product SET quantity = quantity - ${regularizedItems[i].quantity} WHERE id = ${regularizedItems[i].productId}`
+                const sql = `UPDATE Product SET quantity = quantity - ${orderItem.quantity} WHERE id = ${orderItem.productId}`
                 await tx.$queryRaw`${Prisma.raw(sql)}`
             }
             
             // Create Order Items
-            regularizedItemsWithPrice.forEach(async orderItem => {
+            for (const orderItem of regularizedItemsWithPrice){
                 await tx.orderItem.create({data: {
                     productId: orderItem.productId,
                     orderId: order.id,
                     quantity: orderItem.quantity,
                     totalLine: orderItem.linePrice
                 }})
-            })
+            }
 
             return {order, orderItems: regularizedItemsWithPrice}
         })
@@ -126,22 +126,22 @@ export class OrderService {
             tx.orderItem.deleteMany({where: {orderId: order.id}});
             
             // Create Order Items
-            regularizedItems.forEach(async orderItem => {
+            for (const orderItem of regularizedItems){
                 await tx.orderItem.create({data: {
                     productId: orderItem.productId,
                     orderId: order.id,
                     quantity: orderItem.quantity
                 }})
-            })
+            }
         })
 
         return updateOrderRequest
     }
 
     delete(id: string){
-        return this.db.$transaction(async () => {
-            await this.db.orderItem.deleteMany({where: {orderId: Number.parseInt(id)}})
-            await this.db.order.delete({where: {id: Number.parseInt(id)}})
+        return this.db.$transaction(async (tx) => {
+            await tx.orderItem.deleteMany({where: {orderId: Number.parseInt(id)}})
+            await tx.order.delete({where: {id: Number.parseInt(id)}})
         })
     }
 
