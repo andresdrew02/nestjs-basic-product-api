@@ -81,7 +81,7 @@ export class OrderService {
             // Create Order
             const order = await this.db.order.create({data: {
                 userId: req.user.id,
-                status: createOrderRequest.status
+                status: "pending"
             }})
 
 
@@ -143,5 +143,9 @@ export class OrderService {
             await this.db.orderItem.deleteMany({where: {orderId: Number.parseInt(id)}})
             await this.db.order.delete({where: {id: Number.parseInt(id)}})
         })
+    }
+
+    async getUsersOrders(req:any){
+        return this.db.order.findMany({ where: { user: { userId: req.user.id }}})
     }
 }
