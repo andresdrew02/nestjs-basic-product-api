@@ -22,6 +22,11 @@ export class OrderController {
         return this.orderService.save(createOrderRequest, req);
     }
 
+    @Get()
+    getUsersOrders(@Request() req){
+        return this.orderService.getUsersOrders(req);
+    }
+
     // @Put()
     // update(@Body() updateOrderRequest: UpdateOrderRequest){
     //     return this.orderService.update(updateOrderRequest);
