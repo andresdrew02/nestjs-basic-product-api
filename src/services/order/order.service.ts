@@ -71,7 +71,7 @@ export class OrderService {
     }
 
     async save(createOrderRequest: CreateOrderRequest, req: any){
-        const order = await this.db.$transaction(async () => {
+        const order = await this.db.$transaction(async (tx) => {
             // Regularize Order Items quantity
             const regularizedItems = this.regularizeOrderItems(createOrderRequest.orderItems)
 
@@ -79,7 +79,7 @@ export class OrderService {
             const regularizedItemsWithPrice: RegularizedOrderItemsWithPrice[] = await this.calculateOrderItemsWithPrice(regularizedItems)
 
             // Create Order
-            const order = await this.db.order.create({data: {
+            const order = await tx.order.create({data: {
                 userId: req.user.id,
                 status: "pending"
             }})
@@ -93,12 +93,12 @@ export class OrderService {
 
                 // Update Product Quantity
                 const sql = `UPDATE Product SET quantity = quantity - ${regularizedItems[i].quantity} WHERE id = ${regularizedItems[i].productId}`
-                await this.db.$queryRaw`${Prisma.raw(sql)}`
+                await tx.$queryRaw`${Prisma.raw(sql)}`
             }
             
             // Create Order Items
             regularizedItemsWithPrice.forEach(async orderItem => {
-                await this.db.orderItem.create({data: {
+                await tx.orderItem.create({data: {
                     productId: orderItem.productId,
                     orderId: order.id,
                     quantity: orderItem.quantity,
@@ -117,17 +117,17 @@ export class OrderService {
             throw new Error('Order not found')
         }
 
-        this.db.$transaction(async () => {
+        this.db.$transaction(async (tx) => {
             // Update Order
-            await this.db.order.update({ where: { id: order.id }, data: {status: updateOrderRequest.status, userId: updateOrderRequest.userId}})
+            await tx.order.update({ where: { id: order.id }, data: {status: updateOrderRequest.status, userId: updateOrderRequest.userId}})
 
             // Regularized Items
             const regularizedItems = this.regularizeOrderItems(updateOrderRequest.orderItems);
-            this.db.orderItem.deleteMany({where: {orderId: order.id}});
+            tx.orderItem.deleteMany({where: {orderId: order.id}});
             
             // Create Order Items
             regularizedItems.forEach(async orderItem => {
-                await this.db.orderItem.create({data: {
+                await tx.orderItem.create({data: {
                     productId: orderItem.productId,
                     orderId: order.id,
                     quantity: orderItem.quantity
@@ -146,6 +146,6 @@ export class OrderService {
     }
 
     async getUsersOrders(req:any){
-        return this.db.order.findMany({ where: { user: { userId: req.user.id }}})
+        return this.db.order.findMany({ where: { user: { userId: req.user.id }}, include: { orderItems: { include: { product: true}}}})
     }
 }
